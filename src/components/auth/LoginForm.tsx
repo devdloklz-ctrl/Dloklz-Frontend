@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
@@ -16,9 +16,11 @@ type FormData = {
 
 type LoginResponse = {
   token: string;
-  role: "owner" | "vendor";
-  name: string;
-  email: string;
+  user: {
+    name: string;
+    email: string;
+    role: "owner" | "vendor";
+  };
 };
 
 export default function LoginForm() {
@@ -27,29 +29,36 @@ export default function LoginForm() {
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    setError(""); // reset error
+    setError("");
 
     try {
-      const res = await api.post<LoginResponse>("/auth/login", data);
-      const { token, role, name, email } = res.data;
+      // ✅ call login endpoint
+      const res = await api.post<LoginResponse>("/api/auth/login", data);
+      const { token, user } = res.data;
 
-      // Store token & role
-      try {
-        localStorage.setItem("token", token);
-        localStorage.setItem("role", role);
-        localStorage.setItem("name", name);
-        localStorage.setItem("email", email);
-      } catch (e) {
-        console.warn("Failed to store token in localStorage:", e);
+      if (!user || !token) {
+        setError("Invalid server response");
+        return;
       }
 
-      // Redirect based on role
-      if (role === "owner") router.push("/owner/dashboard");
-      else if (role === "vendor") router.push("/vendor/dashboard");
+      // ✅ Store login data
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("name", user.name);
+      localStorage.setItem("email", user.email);
+
+      // ✅ Redirect by role
+      if (user.role === "owner") router.push("/owner/dashboard");
+      else if (user.role === "vendor") router.push("/vendor/dashboard");
       else setError("Unknown role");
     } catch (err: unknown) {
-      // Handle Axios errors
-      if (err && typeof err === "object" && "isAxiosError" in err && (err as AxiosError).isAxiosError) {
+      // ✅ handle errors cleanly
+      if (
+        err &&
+        typeof err === "object" &&
+        "isAxiosError" in err &&
+        (err as AxiosError).isAxiosError
+      ) {
         const axiosErr = err as AxiosError<{ message: string }>;
         setError(axiosErr.response?.data?.message || "Login failed");
       } else if (err instanceof Error) {
@@ -86,7 +95,9 @@ export default function LoginForm() {
           })}
           required
         />
-        {errors.email && <p className="text-red-400 text-sm">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-red-400 text-sm">{errors.email.message}</p>
+        )}
 
         <InputField
           placeholder="Password"
@@ -94,7 +105,9 @@ export default function LoginForm() {
           register={register("password", { required: "Password is required" })}
           required
         />
-        {errors.password && <p className="text-red-400 text-sm">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-red-400 text-sm">{errors.password.message}</p>
+        )}
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <Button type="submit">Login</Button>

@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-    // baseURL: "http://localhost:5555",
-    baseURL: "https://temp-plugin-for-wp.onrender.com",
+    baseURL: "http://localhost:5555",
+    // baseURL: "https://dloklz-api.onrender.com",
     headers: {
         "Content-Type": "application/json",
     },

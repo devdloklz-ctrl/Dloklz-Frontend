@@ -15,9 +15,9 @@ export default function OwnerDashboardLayout({
   ];
 
   return (
-    <div className="flex min-h-screen text-gray-900 bg-gray-50">
-      <Sidebar title="Dloklz Owner" menuItems={ownerMenu} />
-      <main className="flex-1 p-4 overflow-auto">
+    <div className="flex h-screen overflow-hidden text-gray-900 bg-gray-50">
+      <Sidebar title="Dloklz Owner" menuItems={ownerMenu}/>
+      <main className="flex-1 p-4 overflow-hidden">
         {children}
       </main>
     </div>
