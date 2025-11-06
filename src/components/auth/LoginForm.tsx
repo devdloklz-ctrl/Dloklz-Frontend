@@ -17,9 +17,11 @@ type FormData = {
 type LoginResponse = {
   token: string;
   user: {
+    id: string;
     name: string;
     email: string;
     role: "owner" | "vendor";
+    vendorId?: number | string; // ✅ add this
   };
 };
 
@@ -32,7 +34,6 @@ export default function LoginForm() {
     setError("");
 
     try {
-      // ✅ call login endpoint
       const res = await api.post<LoginResponse>("/api/auth/login", data);
       const { token, user } = res.data;
 
@@ -46,13 +47,18 @@ export default function LoginForm() {
       localStorage.setItem("role", user.role);
       localStorage.setItem("name", user.name);
       localStorage.setItem("email", user.email);
+      localStorage.setItem("userId", user.id);
+  
+      // ✅ Save vendorId if present
+      if (user.vendorId) {
+        localStorage.setItem("vendorId", user.vendorId.toString());
+      }
 
       // ✅ Redirect by role
       if (user.role === "owner") router.push("/owner/dashboard");
       else if (user.role === "vendor") router.push("/vendor/dashboard");
       else setError("Unknown role");
     } catch (err: unknown) {
-      // ✅ handle errors cleanly
       if (
         err &&
         typeof err === "object" &&
