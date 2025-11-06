@@ -11,7 +11,7 @@ export default function VendorDashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden text-gray-900 bg-gray-50">
-      <Sidebar title="Dloklz Owner" menuItems={vendorMenu} />
+      <Sidebar title="Dloklz Vendor" menuItems={vendorMenu} />
       <main className="flex-1 p-4 overflow-hidden">
         {children}
       </main>
