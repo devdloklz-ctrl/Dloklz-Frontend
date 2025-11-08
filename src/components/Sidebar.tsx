@@ -3,6 +3,8 @@
 import { useRouter, usePathname } from "next/navigation";
 import { FiLogOut } from "react-icons/fi";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import logo from "../assets/dloklz_logo.png";
 
 interface MenuItem {
   name: string;
@@ -46,7 +48,14 @@ export default function Sidebar({ title, menuItems }: SidebarProps) {
     <aside className="fixed md:relative w-64 h-screen flex flex-col justify-between bg-gray-100 shadow-inner shadow-gray-300 overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-300 text-center shadow-sm">
-        <h1 className="text-xl font-bold text-indigo-700 tracking-wider">{title}</h1>
+        <Image
+          src={logo}
+          alt="App Logo"
+          width={120}
+          height={120}
+          className="mx-auto mb-4"
+        />
+        <h1 className="text-xl font-bold text-[#9dc446] tracking-wider">{title}</h1>
       </div>
 
       {/* Menu */}
