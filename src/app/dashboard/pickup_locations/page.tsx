@@ -3,57 +3,43 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { PickupLocation } from "@/types/pickupLocation";
-import PickupLocationCard from "@/components/vendors/pickup/PickupLocationCard";
-import PickupLocationForm from "@/components/vendors/pickup/PickupLocationForm";
+import PickupLocationGrid from "@/components/vendors/pickup/PickupLocationGrid";
+import PickupLocationModal from "@/components/vendors/pickup/PickupLocationModal";
 import { Plus } from "lucide-react";
-import axios from "axios";
 
 export default function PickupLocationsPage() {
   const [locations, setLocations] = useState<PickupLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<PickupLocation | null>(null);
-  const [openForm, setOpenForm] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"add" | "edit" | "view">("add");
+  const [openModal, setOpenModal] = useState(false);
 
   async function fetchLocations() {
     setLoading(true);
-    const res = await api.get("/vendors/pickup-location");
-    setLocations(res.data.pickupLocations || []);
-    setLoading(false);
+    try {
+      const res = await api.get("/vendors/pickup-location");
+      setLocations(res.data.pickupLocations || []);
+    } catch (err) {
+      // handle error if needed
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-        async function fetchLocations() {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await api.get("vendors/pickup-location");
-                setLocations(response.data.pickupLocations || []);
-            } catch (err: unknown) {
-                if (axios.isAxiosError(err)) {
-                    setError(err.response?.data?.message || err.message);
-                } else if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError("Failed to fetch pickup locations");
-                }
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchLocations();
-    }, []);
+    fetchLocations();
+  }, []);
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Pickup Locations</h1>
 
         <button
           onClick={() => {
             setSelected(null);
-            setOpenForm(true);
+            setMode("add");
+            setOpenModal(true);
           }}
           className="flex items-center gap-2 px-4 py-2 text-white bg-black rounded-lg hover:opacity-90"
         >
@@ -61,38 +47,40 @@ export default function PickupLocationsPage() {
         </button>
       </div>
 
-      {/* List */}
       {loading ? (
         <p>Loading...</p>
-      ) : locations.length === 0 ? (
-        <p className="text-gray-500">No pickup locations yet</p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {locations.map((loc) => (
-            <PickupLocationCard
-              key={loc._id}
-              location={loc}
-              onEdit={() => {
-                setSelected(loc);
-                setOpenForm(true);
-              }}
-              onUpdated={fetchLocations}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Drawer / Modal */}
-      {openForm && (
-        <PickupLocationForm
-          initialData={selected ?? undefined}
-          onClose={() => setOpenForm(false)}
-          onSuccess={() => {
-            setOpenForm(false);
+        <PickupLocationGrid
+          locations={locations}
+          onView={(loc) => {
+            setSelected(loc);
+            setMode("view");
+            setOpenModal(true);
+          }}
+          onEdit={(loc) => {
+            setSelected(loc);
+            setMode("edit");
+            setOpenModal(true);
+          }}
+          onDelete={async (loc) => {
+            if (!confirm("Are you sure you want to delete this pickup location?")) return;
+            await api.delete(`/vendors/pickup-location/${loc._id}`);
             fetchLocations();
           }}
+          onUpdated={fetchLocations}
         />
       )}
+
+      <PickupLocationModal
+        open={openModal}
+        mode={mode}
+        location={selected ?? undefined}
+        onClose={() => setOpenModal(false)}
+        onSuccess={() => {
+          setOpenModal(false);
+          fetchLocations();
+        }}
+      />
     </div>
   );
 }

@@ -3,9 +3,10 @@ import PickupLocationCard from "./PickupLocationCard";
 
 interface Props {
   locations: PickupLocation[];
-  onView: (l: PickupLocation) => void;
-  onEdit: (l: PickupLocation) => void;
-  onDelete: (l: PickupLocation) => void;
+  onView: (location: PickupLocation) => void;
+  onEdit: (location: PickupLocation) => void;
+  onDelete: (location: PickupLocation) => void;
+  onUpdated?: () => void; // optional, forwarded if needed
 }
 
 export default function PickupLocationGrid({
@@ -13,12 +14,11 @@ export default function PickupLocationGrid({
   onView,
   onEdit,
   onDelete,
+  onUpdated,
 }: Props) {
   if (!locations.length) {
     return (
-      <div className="py-16 text-center text-gray-500">
-        No pickup locations yet
-      </div>
+      <div className="py-16 text-center text-gray-500">No pickup locations yet</div>
     );
   }
 
@@ -28,9 +28,10 @@ export default function PickupLocationGrid({
         <PickupLocationCard
           key={loc._id}
           location={loc}
-          onView={onView}
-          onEdit={onEdit}
-          onDelete={onDelete}
+          onView={() => onView(loc)}
+          onEdit={() => onEdit(loc)}
+          onDelete={() => onDelete(loc)}
+          onUpdated={onUpdated}
         />
       ))}
     </div>

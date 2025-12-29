@@ -23,9 +23,7 @@ export default function PickupLocationModal({
       <div className="w-full max-w-lg p-6 bg-white rounded-xl">
         {mode === "view" ? (
           <div>
-            <h2 className="mb-4 text-xl font-semibold">
-              {location?.name}
-            </h2>
+            <h2 className="mb-4 text-xl font-semibold">{location?.name}</h2>
             <div className="space-y-2 text-sm">
               <p><b>Address:</b> {location?.address}</p>
               <p><b>City:</b> {location?.city}</p>
@@ -34,16 +32,13 @@ export default function PickupLocationModal({
               <p><b>Phone:</b> {location?.phone}</p>
             </div>
             <div className="mt-6 text-right">
-              <button onClick={onClose} className="btn-secondary">
-                Close
-              </button>
+              <button onClick={onClose} className="btn-secondary">Close</button>
             </div>
           </div>
         ) : (
           <PickupLocationForm
             initialData={mode === "edit" ? location : undefined}
-            mode={mode}
-            onCancel={onClose}
+            onClose={onClose}
             onSuccess={onSuccess}
           />
         )}
