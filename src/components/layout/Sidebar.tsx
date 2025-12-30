@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import Image from "next/image";
+import Logo from "../../../public/brand_logo.png";
 
 export default function Sidebar({ role }: { role: string[] }) {
   const pathname = usePathname();
@@ -42,10 +44,16 @@ export default function Sidebar({ role }: { role: string[] }) {
     <aside className="w-64 min-h-screen bg-background border-r shadow-[2px_0_12px_rgba(0,0,0,0.04)]">
       {/* Brand */}
       <div className="px-8 pt-10 pb-8 mb-10 border-b">
-        <h1 className="text-xl tracking-widest uppercase font-brand">
+        {/* <h1 className="text-xl tracking-widest uppercase font-brand">
           Dloklz Store
-        </h1>
-        <p className="text-xs tracking-wider text-muted-foreground">
+        </h1> */}
+        <Image
+          src={Logo}
+          height={100}
+          width={160}
+          alt="Dloklz Store"
+        />
+        <p className="text-xs tracking-wider text-muted-foreground pl-2">
           Since 2025
         </p>
       </div>
